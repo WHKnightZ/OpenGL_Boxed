@@ -1,0 +1,18 @@
+3 2
+1 1 1
+1 1 1
+0 0
+1
+1 1 3 1
+1
+2 0 3 1
+
+/*
+Width Height
+Data Map (Width x Height Nums)
+x y of Player
+Count of Box Small
+x y Direction Type of Box Small
+Count of Box Big
+x y Direction Type of Box Big
+*/
