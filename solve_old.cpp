@@ -1,7 +1,6 @@
 #include "main.h"
 
 #define MAX_STEP 50
-#define HASH_COUNT 1024
 
 enum RETURN_STATE {
     CANT_MOVE,
@@ -29,10 +28,9 @@ class c_Case {
   public:
     c_Case() {
         Prev = nullptr;
-        Hash();
     }
     c_Case(char x, char y, c_Case *p, s_Return *r, char Drt);
-    int x, y, Drt, Hash_Code;
+    int x, y, Drt, Sum;
     s_Box_Coord Small[MAX];
     s_Box_Coord Big[MAX];
     s_Return Return;
@@ -42,7 +40,6 @@ class c_Case {
     char Find_Big(char &x, char &y);
     bool Check_Win(char &x, char &y);
     void Move(char x, char y, char Drt);
-    void Hash();
     bool BFS();
 };
 
@@ -62,8 +59,12 @@ c_Case::c_Case(char x, char y, c_Case *p, s_Return *r, char Drt) {
         Big[r->Big].x = x;
         Big[r->Big].y = y;
     }
+    Sum = x + y;
+    for (int i = 0; i < Count_Small; i++)
+        Sum += (Small[i].x + Small[i].y);
+    for (int i = 0; i < Count_Big; i++)
+        Sum += (Big[i].x + Big[i].y);
     Prev = p;
-    Hash();
 }
 
 char c_Case::Find_Small(char &x, char &y) {
@@ -90,15 +91,6 @@ bool c_Case::Check_Win(char &x, char &y) {
     if (Small_T[Small].Type != GOAL || Big_T[Big].Type != GOAL)
         return false;
     return true;
-}
-
-void c_Case::Hash() {
-    Hash_Code = x + y * 2;
-    for (int i = 0; i < Count_Small; i++)
-        Hash_Code += Small[i].x * 4 + Small[i].y * 8;
-    for (int i = 0; i < Count_Big; i++)
-        Hash_Code += Big[i].x * 16 + Big[i].y * 32;
-    Hash_Code %= HASH_COUNT;
 }
 
 void c_Case::Move(char x, char y, char Drt) {
@@ -153,9 +145,6 @@ void Insert(s_List **List, c_Case *p) {
     *List = l;
 }
 
-c_Case *List_Check[HASH_COUNT][1000];
-int List_Check_Count[HASH_COUNT];
-
 s_List *List_Case[MAX_STEP];
 int Count_Case = 0;
 int Count_Per_Case[MAX_STEP];
@@ -167,6 +156,8 @@ bool Box_Coord_Equal(s_Box_Coord *p, s_Box_Coord *q) {
 }
 
 bool Case_Equal(c_Case *p, c_Case *q) {
+    if (p->Sum != q->Sum)
+        return false;
     if (p->x != q->x || p->y != q->y)
         return false;
     for (int i = 0; i < Count_Small; i++) {
@@ -180,14 +171,15 @@ bool Case_Equal(c_Case *p, c_Case *q) {
 }
 
 bool Check_In_List(c_Case *p) {
-    int n = p->Hash_Code;
-    int *m = &List_Check_Count[n];
-    for (int i = 0; i < *m; i++) {
-        if (Case_Equal(p, List_Check[n][i]))
-            return true;
+    s_List *ptr;
+    for (int i = Count_Case; i >= 0; i--) {
+        ptr = List_Case[i];
+        while (ptr != nullptr) {
+            if (Case_Equal(p, ptr->Data))
+                return true;
+            ptr = ptr->Next;
+        }
     }
-    List_Check[n][*m] = p;
-    (*m)++;
     return false;
 }
 
@@ -272,8 +264,6 @@ void Solve() {
     List_Case[Count_Case] = nullptr;
     Insert(&List_Case[Count_Case], p);
     s_List *ptr;
-    for (int i = 0; i < HASH_COUNT; i++)
-        List_Check_Count[i] = 0;
     while (List_Case[Count_Case] != nullptr) {
         List_Case[Count_Case + 1] = nullptr;
         Count_Per_Case[Count_Case + 1] = 0;

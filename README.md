@@ -17,4 +17,6 @@ I use Breadth First Search and Brute-Force Search to make a Solve function, But 
 
 Please help me to improve a solving performance
 
+Update: < 1s Solve Level 7 :)
+
 Original game: https://www.mathsisfun.com/games/boxup-puzzle.html
