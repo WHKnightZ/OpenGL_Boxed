@@ -21,7 +21,7 @@
 #define MAX 8
 #define TILE_SIZE 70
 #define MAX_BOX 16
-#define LEVEL 7
+#define LEVEL 1
 
 int POS_X, POS_Y;
 

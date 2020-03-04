@@ -1,7 +1,7 @@
 #include "main.h"
 
-#define MAX_STEP 50
-#define HASH_COUNT 1024
+#define MAX_STEP 80
+#define HASH_COUNT 160000
 
 enum RETURN_STATE {
     CANT_MOVE,
@@ -93,11 +93,11 @@ bool c_Case::Check_Win(char &x, char &y) {
 }
 
 void c_Case::Hash() {
-    Hash_Code = x + y * 2;
+    Hash_Code = x*15 + y * 27;
     for (int i = 0; i < Count_Small; i++)
-        Hash_Code += Small[i].x * 4 + Small[i].y * 8;
+        Hash_Code += Small[i].x * 3*(i+31) + Small[i].y * 18*(i+35);
     for (int i = 0; i < Count_Big; i++)
-        Hash_Code += Big[i].x * 16 + Big[i].y * 32;
+        Hash_Code += Big[i].x * 47*(i+118) + Big[i].y * 31*(i+27);
     Hash_Code %= HASH_COUNT;
 }
 
